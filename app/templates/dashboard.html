@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Empresarial - León Dorado</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/dashboard.css">
+    <link rel="stylesheet" href="../static/css/grafica.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <div class="lion-logo">
+                    
+                        <img src="../static/image/logo.png" alt="Logo" style="width:70px; height:auto;">
+                    
+                </div>
+                <h2><i class="fas fa-chart-line"></i> Lions International</h2>
+                <p>Sistema de Gestión Empresarial</p>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/productos" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>Productos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/empleados" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Empleados</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/supervisores" class="nav-link">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Supervisores</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/ventas" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Ventas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/reporte" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="welcome-section">
+                        <h1>¡Bienvenido, {{ nombre }}!</h1>
+                        <div class="role-badge">
+                            <i class="fas fa-crown"></i>
+                            <span>Rol: {{ rol }}</span>
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        <a href="{{ url_for('logout') }}" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_productos }}</div>
+                    <div class="stat-label">Total Productos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_empleados }}</div>
+                    <div class="stat-label">Empleados Activos</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_supervisores }}</div>
+                    <div class="stat-label">Supervisores</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">${{ total_ventas }}</div>
+                    <div class="stat-label">Master del Mes</div>
+                </div>
+            </section>
+
+            <!-- Dashboard Grid -->
+            <section class="dashboard-grid">
+                <div class="dashboard-card productos">
+                    <div class="card-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Gestión de Productos</h3>
+                        <p>Administra tu inventario, precios y categorías de productos de manera eficiente.</p>
+                        <button class="card-btn" onclick="location.href='/productos'">
+                            <i class="fas fa-arrow-right"></i>
+                            Acceder
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card empleados">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Empleados</h3>
+                        <p>Gestiona la información de empleados, horarios y asignaciones de trabajo.</p>
+                        <button class="card-btn" onclick="location.href='/empleados'">
+                            <i class="fas fa-arrow-right"></i>
+                            Acceder
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card supervisores">
+                    <div class="card-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Supervisores</h3>
+                        <p>Control de supervisores, asignación de equipos y seguimiento de desempeño.</p>
+                        <button class="card-btn" onclick="location.href='/supervisores'">
+                            <i class="fas fa-arrow-right"></i>
+                            Acceder
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card ventas">
+                    <div class="card-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Sistema de Ventas</h3>
+                        <p>Procesamiento de órdenes, facturación y seguimiento de transacciones.</p>
+                        <button class="card-btn" onclick="location.href='/ventas'">
+                            <i class="fas fa-arrow-right"></i>
+                            Acceder
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card reportes">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Reporte Semanal de Ventas</h3>
+                        <p>Análisis detallado de ventas, métricas de rendimiento y tendencias semanales.</p>
+                        <button class="card-btn" onclick="location.href='/reporte'">
+                            <i class="fas fa-arrow-right"></i>
+                            Ver Reporte
+                        </button>
+                    </div>
+                </div>
+                
+            </section>
+            
+    <div class="dashboard-container-g">
+        <div class="header-g">
+            <h3>📊 Ventas y Rendimiento (últimos 5 días)</h3>
+        </div>
+
+        <div class="chart-section">
+            <!-- Tarjetas de estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-cards">
+                    <div class="stat-value" id="totalVentas"></div>
+                    <div class="stat-label">Total Ventas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="promedioVentas">$0</div>
+                    <div class="stat-label">Promedio Diario</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRendimiento">$0</div>
+                    <div class="stat-label">Total Master</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="mejorDia">-</div>
+                    <div class="stat-label">Mejor Día</div>
+                </div>
+            </div>
+
+            <div class="decorative-line"></div>
+
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="ventasChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        </main>
+    </div>
+
+    <script>
+        // Add interactive hover effects
+        document.querySelectorAll('.dashboard-card').forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-20px) scale(1.02)';
+                this.style.borderColor = '#ffb347';
+            });
+
+            card.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.borderColor = '#ffd700';
+            });
+        });
+
+        // Add click animation to buttons
+        document.querySelectorAll('.card-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Create golden ripple effect
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 215, 0, 0.8)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.left = (e.offsetX - 10) + 'px';
+                ripple.style.top = (e.offsetY - 10) + 'px';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                    // Navigate after animation
+                    window.location.href = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                }, 600);
+            });
+        });
+
+        // Add golden ripple animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Mobile menu toggle
+        const menuToggle = document.createElement('button');
+        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        menuToggle.style.cssText = `
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #000;
+            border: 2px solid #b8860b;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        `;
+
+        if (window.innerWidth <= 768) {
+            menuToggle.style.display = 'block';
+            document.body.appendChild(menuToggle);
+
+            menuToggle.addEventListener('click', () => {
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.style.left = sidebar.style.left === '0px' ? '-280px' : '0px';
+            });
+        }
+
+        // Add crown rotation animation to lion logo
+        const crownIcon = document.querySelector('.lion-logo i');
+        setInterval(() => {
+            crownIcon.style.transform = 'rotateY(360deg)';
+            setTimeout(() => {
+                crownIcon.style.transform = 'rotateY(0deg)';
+            }, 1000);
+        }, 5000);
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Datos de ejemplo (reemplaza con tus datos de Flask)
+        const dias = {{ dias| tojson }};
+        const ventas = {{ ventas| tojson }};
+        const rendimiento = {{ rendimiento| tojson }};
+
+        // Calcular estadísticas
+        const totalVentas = ventas.reduce((a, b) => a + b, 0);
+        const promedioVentas = Math.round(totalVentas / ventas.length);
+        const totalRendimiento = rendimiento.reduce((a, b) => a + b, 0);
+        const mejorDiaIndex = ventas.indexOf(Math.max(...ventas));
+        const mejorDia = dias[mejorDiaIndex];
+
+        // Actualizar estadísticas en el DOM
+        document.getElementById('totalVentas').textContent = `$${totalVentas.toLocaleString()}`;
+        document.getElementById('promedioVentas').textContent = `$${promedioVentas.toLocaleString()}`;
+        document.getElementById('totalRendimiento').textContent = `$${totalRendimiento.toLocaleString()}`;
+        document.getElementById('mejorDia').textContent = mejorDia;
+
+        // Configuración de la gráfica
+        const ctx = document.getElementById('ventasChart').getContext('2d');
+        const ventasChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dias,
+                datasets: [
+                    {
+                        label: 'Ventas ($)',
+                        data: ventas,
+                        backgroundColor: 'rgba(255, 215, 0, 0.7)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Rendimiento ($)',
+                        data: rendimiento,
+                        type: 'line',
+                        borderColor: '#00FF7F',
+                        backgroundColor: 'rgba(0, 255, 127, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#00FF7F',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#00FF7F',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'center',
+                        labels: {
+                            color: '#ffffff',
+                            font: {
+                                family: 'Inter',
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        titleColor: '#FFD700',
+                        bodyColor: '#ffffff',
+                        borderColor: 'rgba(255, 215, 0, 0.3)',
+                        borderWidth: 1,
+                        cornerRadius: 12,
+                        displayColors: true,
+                        callbacks: {
+                            title: function (context) {
+                                return context[0].label;
+                            },
+                            label: function (context) {
+                                const value = context.parsed.y || context.parsed;
+                                return `${context.dataset.label}: $${value.toLocaleString()}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#ffffff',
+                            font: {
+                                family: 'Inter',
+                                size: 12,
+                                weight: '500'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            lineWidth: 1
+                        },
+                        border: {
+                            color: 'rgba(255, 215, 0, 0.3)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#ffffff',
+                            font: {
+                                family: 'Inter',
+                                size: 12,
+                                weight: '500'
+                            },
+                            callback: function (value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            lineWidth: 1
+                        },
+                        border: {
+                            color: 'rgba(255, 215, 0, 0.3)'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            },
+            plugins: [{
+                afterDatasetsDraw: function (chart) {
+                    const ctx = chart.ctx;
+                    chart.data.datasets.forEach((dataset, i) => {
+                        if (dataset.type !== 'line') return; // Solo mostrar valores en la línea
+
+                        const meta = chart.getDatasetMeta(i);
+                        if (!meta.hidden) {
+                            meta.data.forEach((element, index) => {
+                                // Dibujar el valor encima de cada punto
+                                ctx.fillStyle = '#00FF7F';
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+
+                                const dataString = '$' + dataset.data[index].toLocaleString();
+                                ctx.fillText(dataString, element.x, element.y - 8);
+                            });
+                        }
+                    });
+
+                    // Mostrar valores en las barras
+                    chart.data.datasets.forEach((dataset, i) => {
+                        if (dataset.type === 'line') return; // Solo mostrar valores en las barras
+
+                        const meta = chart.getDatasetMeta(i);
+                        if (!meta.hidden) {
+                            meta.data.forEach((element, index) => {
+                                ctx.fillStyle = '#1a1a1a';
+                                ctx.font = 'bold 11px Inter';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+
+                                const dataString = '$' + dataset.data[index].toLocaleString();
+                                ctx.fillText(dataString, element.x, element.y - 4);
+                            });
+                        }
+                    });
+                }
+            }]
+        });
+
+        // Para usar con Flask, reemplaza los datos de ejemplo con:
+        /*
+        const dias = {{ dias|tojson }};
+        const ventas = {{ ventas|tojson }};
+        const rendimiento = {{ rendimiento|tojson }};
+        */
+    </script>
+
+</body>
+
+</html>

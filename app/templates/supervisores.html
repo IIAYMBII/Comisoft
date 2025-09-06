@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Supervisores</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/supervisores.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>Supervisores</h2>
+    <a href="{{ url_for('dashboard') }}">← Volver al Dashboard</a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Formulario Agregar -->
+    <form method="post">
+        <input type="hidden" name="action" value="agregar">
+        <input type="text" name="nombre" placeholder="Nombre supervisor" required>
+        <input type="number" step="0.01" name="comision" placeholder="Comisión por pieza" required>
+        <button type="submit">Agregar Supervisor</button>
+    </form>
+
+    <h3>Lista de Supervisores</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Comisión por pieza</th>
+            <th>Acciones</th>
+        </tr>
+        {% for sup in supervisores %}
+        <tr>
+            <td data-label="ID">{{ sup[0] }}</td>
+            <td data-label="Nombre">{{ sup[1] }}</td>
+            <td data-label="Comisión">{{ sup[2] }}</td>
+            <td data-label="Acciones" class="actions">
+                <!-- Botón Editar -->
+                <form method="post">
+                    <input type="hidden" name="action" value="editar">
+                    <input type="hidden" name="id" value="{{ sup[0] }}">
+                    <input type="text" name="nombre" value="{{ sup[1] }}" required>
+                    <input type="number" step="0.01" name="comision" value="{{ sup[2] }}" required>
+                    <button type="submit" class="edit">Editar</button>
+                </form>
+
+                <!-- Botón Eliminar -->
+                <form method="post" onsubmit="return confirm('¿Seguro que deseas eliminar este supervisor?');">
+                    <input type="hidden" name="action" value="eliminar">
+                    <input type="hidden" name="id" value="{{ sup[0] }}">
+                    <button type="submit" class="delete">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

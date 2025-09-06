@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lions International - Ventas Grupales</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/ventas.css') }}">
+</head>
+<body>
+    <!-- Partículas doradas flotantes -->
+    <div class="gold-particle" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
+    <div class="gold-particle" style="top: 20%; left: 80%; animation-delay: 1s;"></div>
+    <div class="gold-particle" style="top: 60%; left: 15%; animation-delay: 2s;"></div>
+    <div class="gold-particle" style="top: 80%; left: 70%; animation-delay: 0.5s;"></div>
+    <div class="gold-particle" style="top: 40%; left: 90%; animation-delay: 1.5s;"></div>
+
+    <div class="header-logo">
+        <div class="logo-container">
+            <div class="lion-icon">🦁</div>
+            <div class="company-name">LIONS INTERNATIONAL</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Registro de Ventas Grupales (Paquetes)</h2>
+        <a href="{{ url_for('dashboard') }}">← Volver al Dashboard</a>
+
+        <form method="post">
+        <table>
+            <thead>
+                <tr>
+                    <th>Empleado</th>
+                    <th>Supervisor</th>
+                    <th>Producto</th>
+                    <th>Llevó (paq.)</th>
+                    <th>Vendidas (paq.)</th>
+                    <th>Vendidas (piezas)</th>
+                    <th>Regresa (piezas)</th>
+                    <th>Precio Unitario</th>
+                    <th>Total Venta</th>
+                    <th>Comisión</th>
+                    <th>Ganancia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in empleados %}
+                <tr>
+                    <td>
+                        {{ emp[1] }}
+                        <input type="hidden" name="empleado_id" value="{{ emp[0] }}">
+                    </td>
+                    <td>
+                        {{ emp[3] or "Sin supervisor" }}
+                        <input type="hidden" name="supervisor_id" value="{{ emp[2] or '' }}">
+                        <input type="hidden" class="comision" value="{{ emp[4] or 0 }}">
+                    </td>
+                    <td>
+                        <select name="producto_id" class="producto" required>
+                            {% for prod in productos %}
+                            <option value="{{ prod[0] }}" data-precio="{{ prod[3] }}">{{ prod[1] }} (Stock: {{ prod[2] }})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input type="number" name="llevo" class="llevo" value="0" min="0" step="0.25"></td>
+                    <td><input type="number" name="vendidas" class="vendidas_input" value="0" min="0" step="0.25"></td>
+                    <td class="vendidas_piezas">0</td>
+                    <td class="regresa">0</td>
+                    <td class="precio">0</td>
+                    <td class="total">0</td>
+                    <td class="comision_calc">0</td>
+                    <td class="ganancia">0</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6">Totales</td>
+                    <td id="total_regresa">0</td>
+                    <td id="total_precio">0</td>
+                    <td id="total_venta">0</td>
+                    <td id="total_comision">0</td>
+                    <td id="total_ganancia">0</td>
+                </tr>
+            </tfoot>
+        </table>
+        <button type="submit">Guardar Reporte</button>
+    </form>
+    </div>
+
+    <script>
+        function calcular() {
+            let totalVenta = 0, totalComision = 0, totalGanancia = 0, totalRegresa = 0;
+            document.querySelectorAll("tbody tr").forEach(row => {
+                let llevoPaq = parseFloat(row.querySelector(".llevo").value) || 0;
+                let vendidasPaq = parseFloat(row.querySelector(".vendidas_input").value) || 0;
+
+                // Convertir paquetes a piezas
+                let vendidasPiezas = vendidasPaq * 2;
+                let llevoPiezas = llevoPaq * 2;
+                let regresa = llevoPiezas - vendidasPiezas;
+                if (regresa < 0) regresa = 0;
+
+                row.querySelector(".vendidas_piezas").textContent = vendidasPiezas;
+                row.querySelector(".regresa").textContent = regresa;
+
+                let producto = row.querySelector(".producto");
+                let precio = parseFloat(producto.options[producto.selectedIndex].dataset.precio) || 0;
+                let comisionPorPieza = parseFloat(row.querySelector(".comision").value) || 0;
+
+                let total = vendidasPiezas * precio;
+                let comision = vendidasPiezas * comisionPorPieza;
+                let ganancia = total - comision;
+
+                row.querySelector(".precio").textContent = precio.toFixed(2);
+                row.querySelector(".total").textContent = total.toFixed(2);
+                row.querySelector(".comision_calc").textContent = comision.toFixed(2);
+                row.querySelector(".ganancia").textContent = ganancia.toFixed(2);
+
+                totalVenta += total;
+                totalComision += comision;
+                totalGanancia += ganancia;
+                totalRegresa += regresa;
+            });
+
+            document.getElementById("total_venta").textContent = totalVenta.toFixed(2);
+            document.getElementById("total_comision").textContent = totalComision.toFixed(2);
+            document.getElementById("total_ganancia").textContent = totalGanancia.toFixed(2);
+            document.getElementById("total_regresa").textContent = totalRegresa;
+        }
+
+        document.querySelectorAll(".vendidas_input, .producto, .llevo").forEach(input => {
+            input.addEventListener("input", calcular);
+        });
+
+        // Efecto de rugido del león al hacer clic
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.lion-icon')) {
+                setTimeout(() => {
+                    e.target.closest('.lion-icon').classList.remove('lion-roar');
+                }, 500);
+            }
+        });
+
+        // Generar partículas doradas aleatorias
+        function createGoldParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'gold-particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 3000);
+        }
+
+        // Crear partículas periódicamente
+        setInterval(createGoldParticle, 2000);
+
+        calcular();
+    </script>
+</body>
+</html>

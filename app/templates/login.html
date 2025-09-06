@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Lions International</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/login.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Sección del logo -->
+        <div class="logo-section">
+            <div class="logo-container">
+                <div class="logo-placeholder">
+                    <img src="{{ url_for('static', filename='../static/image/logo.png') }}" alt="Logo" class="logo-image">
+                </div>
+                <h1 class="brand-text">Lions International</h1>
+                <p class="brand-subtitle">Inventarios</p>
+            </div>
+        </div>
+
+        <!-- Sección de login -->
+        <div class="login-section">
+            <div class="decorative-line"></div>
+            <div class="login-box">
+                <h2>Bienvenido</h2>
+                <p class="welcome-text">Accede a tu cuenta para continuar</p>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert">{{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+                
+                <form method="post">
+                    <div class="form-group">
+                        <input type="text" name="nombre" placeholder="Usuario" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" name="contraseña" placeholder="Contraseña" required>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">Iniciar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

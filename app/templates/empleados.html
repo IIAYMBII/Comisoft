@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Empleados - León Dorado</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/empleados.css') }}">
+</head>
+
+<body>
+    <div class="container">
+    <h2><i class="fas fa-users"></i> Empleados</h2>
+    <a href="{{ url_for('dashboard') }}">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="{{ category }}">
+            {% if category == 'alert' %}
+              <i class="fas fa-exclamation-triangle"></i>
+            {% else %}
+              <i class="fas fa-check-circle"></i>
+            {% endif %}
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Formulario Agregar -->
+    <!-- Formulario Agregar -->
+<form id="formAgregar" method="post">
+    <input type="hidden" name="action" value="agregar">
+    <input type="text" name="nombre" placeholder="Nombre del empleado" required>
+    <select name="id_supervisor" required>
+        <option value="">Seleccionar supervisor</option>
+        {% for sup in supervisores %}
+        <option value="{{ sup[0] }}">{{ sup[1] }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">
+        <i class="fas fa-user-plus"></i> Agregar Empleado
+    </button>
+</form>
+
+
+    <h3><i class="fas fa-list"></i> Lista de Empleados</h3>
+    <table>
+        <thead>
+            <tr>
+                <th><i class="fas fa-hashtag"></i> ID</th>
+                <th><i class="fas fa-user"></i> Nombre</th>
+                <th><i class="fas fa-user-tie"></i> Supervisor</th>
+                <th><i class="fas fa-coins"></i> Comisión Supervisor</th>
+                <th><i class="fas fa-cogs"></i> Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for emp in empleados %}
+        <tr>
+            <td>{{ emp[0] }}</td>
+            <td>{{ emp[1] }}</td>
+            <td>{{ emp[2] or "Sin supervisor" }}</td>
+            <td>${{ emp[3] or 0 }}</td>
+            <td class="actions">
+                <!-- Editar -->
+                <form method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="editar">
+                    <input type="hidden" name="id" value="{{ emp[0] }}">
+                    <input type="text" name="nombre" value="{{ emp[1] }}" required>
+                    <select name="id_supervisor" required>
+                        {% for sup in supervisores %}
+                        <option value="{{ sup[0] }}" {% if emp[2] == sup[1] %}selected{% endif %}>{{ sup[1] }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="edit">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                </form>
+
+                <!-- Eliminar -->
+                <form method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este empleado?');">
+                    <input type="hidden" name="action" value="borrar">
+                    <input type="hidden" name="id" value="{{ emp[0] }}">
+                    <button type="submit" class="delete">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    <script>
+        // Auto-hide flash messages
+        setTimeout(() => {
+            document.querySelectorAll('.alert, .success').forEach(msg => {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateY(-20px)';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+
+       
+
+        // Add golden ripple effect to buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function (e) {
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                const ripple = document.createElement('span');
+                ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 215, 0, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            `;
+
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add ripple animation
+        const rippleStyle = document.createElement('style');
+        rippleStyle.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+        document.head.appendChild(rippleStyle);
+
+        // Enhanced hover effects for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function () {
+                this.style.borderLeft = '4px solid #ffd700';
+                this.style.boxShadow = '0 10px 30px rgba(255, 215, 0, 0.3)';
+            });
+
+            row.addEventListener('mouseleave', function () {
+                this.style.borderLeft = 'none';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Input focus effects
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('focus', function () {
+                this.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.3)';
+            });
+
+            input.addEventListener('blur', function () {
+                this.style.boxShadow = '';
+            });
+        });
+
+        document.getElementById("formAgregar").addEventListener("submit", function () {
+    setTimeout(() => {
+        this.reset(); // limpia el formulario
+    }, 100); // pequeño delay para que se envíe antes
+});
+
+    </script>
+</body>
+
+</html>

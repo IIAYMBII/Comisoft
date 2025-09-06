@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Ventas - Lions International</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/reporte.css') }}">
+    
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header con Logo -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo-container" onclick="changeLogo()">
+                    <div class="logo" id="logoDisplay">
+    <img src="{{ url_for('static', filename='/image/logo.png') }}" alt="Logo" style="width:60px; height:auto;">
+</div>
+
+                </div>
+                <div class="company-info">
+                    <h1 class="sparkle">LIONS INTERNATIONAL</h1>
+                    <h2>Sistema de Ventas Corporativo</h2>
+                    <p>Reporte Detallado de Ventas y Análisis</p>
+                    <!-- -->
+                </div>
+            </div>
+            <div class="export-buttons">
+                <button class="export-btn pdf-btn" onclick="exportToPDF()">
+                    📄 Exportar PDF
+                </button>
+                <button class="export-btn excel-btn" onclick="exportToExcel()">
+                    📊 Exportar Excel
+                </button>
+                   <a href="{{ url_for('dashboard') }}" class="back-link">🔙 Regresar al Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Logo Upload Section -->
+
+<div id="logoDisplay" style="display:none;">
+   <img src="static/images/logo.png" alt="Logo" width="80" height="80">
+</div>
+
+<table id="salesTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>👤 Empleado</th>
+            <th>📦 Producto</th>
+            <th>📊 Paquetes</th>
+            <th>🔢 Piezas</th>
+            <th>💰 Precio Unit.</th>
+            <th>💵 Total Venta</th>
+            <th>🎯 Comisión</th>
+            <th>📈 Master</th>
+            <th>📅 Fecha</th>
+            <th>🗑️ Acción</th> <!-- Nueva columna para botón -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for v in ventas %}
+        <tr>
+            <td>{{ v[0] }}</td>
+            <td>{{ v[1] }}</td>
+            <td>{{ v[2] }}</td>
+            <td>{{ v[3] }}</td>
+            <td>{{ v[4] }}</td>
+            <td>${{ "%.2f"|format(v[5]) }}</td>
+            <td>${{ "%.2f"|format(v[6]) }}</td>
+            <td>${{ "%.2f"|format(v[7]) }}</td>
+            <td>${{ "%.2f"|format(v[8]) }}</td>
+            <td>{{ v[9] }}</td>
+            <td>
+                <form action="{{ url_for('delete_venta', venta_id=v[0]) }}" method="post" style="display:inline;">
+                    <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta venta?')">Borrar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+        <div class="totales">
+            <div class="total-card">
+                <h3>📊 Piezas Vendidas</h3>
+                <div class="value">{{ total_piezas }}</div>
+                <div class="label">Unidades Comercializadas</div>
+            </div>
+            <div class="total-card">
+                <h3>💰 Total Ventas</h3>
+                <div class="value">${{ "%.2f"|format(total_venta) }}</div>
+                <div class="label">Ingresos Generados</div>
+            </div>
+            <div class="total-card">
+                <h3>📦 Stock Bodega</h3>
+                <div class="value">{{ total_bodega }}</div>
+                <div class="label">Inventario Disponible</div>
+            </div>
+        </div>
+        
+
+        <!-- Footer Corporativo -->
+        <footer class="corporate-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>🦁 Lions International</h4>
+                    <p>Sistema de Gestión Comercial</p>
+                    <p>Versión 2.0.1</p>
+                </div>
+                <div class="footer-section">
+                    <h4>📞 Contacto</h4>
+                    <p>Email: testingnomas@gmail.com</p>
+                    <p>Tel: +52 (712 172 4081) </p>
+                    <p>Soporte llamar: +52 (712 172 4081) </p>
+                </div>
+                <div class="footer-section">
+                    <h4>🔒 Información Legal</h4>
+                    <p>Documento Confidencial</p>
+                    <p>© 2024 Lions International</p>
+                    <p>Todos los derechos reservados</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>🌐 www.lionsinternational.com | 📅 Generado: <span id="currentDate"></span></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts externos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        // Encapsular todo en un IIFE para evitar conflictos globales
+        (function () {
+            'use strict';
+
+            // Función para cambiar el logo
+            function changeLogo() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+
+                input.onchange = function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            const logoDisplay = document.getElementById('logoDisplay');
+                            logoDisplay.innerHTML = `<img src="${event.target.result}" alt="Lions International Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+
+                            // Efecto visual de éxito
+                            logoDisplay.parentElement.style.transform = 'scale(1.2)';
+                            setTimeout(() => {
+                                logoDisplay.parentElement.style.transform = 'scale(1)';
+                            }, 300);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+
+                input.click();
+            }
+
+            // Función para exportar a PDF
+            function exportToPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4');
+
+                // Configurar colores corporativos
+                doc.setFillColor(255, 215, 0); // Dorado
+                doc.rect(0, 0, 297, 30, 'F');
+
+                // Logo y título
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(24);
+                doc.text('LIONS INTERNATIONAL', 20, 20);
+                //imagen del logo
+                const logoImg = document.getElementById('logoDisplay').querySelector('img');
+doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25); // 297 - margen - ancho
+
+
+
+                doc.setFontSize(16);
+                doc.text('Reporte Corporativo de Ventas', 20, 40);
+
+                doc.setTextColor(100, 100, 100);
+                doc.setFontSize(12);
+                doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 20, 50);
+                doc.text('Sistema de Gestión Comercial', 20, 60);
+
+                // Obtener datos de la tabla
+                const table = document.getElementById('salesTable');
+                const rows = [];
+
+                // Headers
+                const headers = [];
+                table.querySelectorAll('thead th').forEach(th => {
+                    headers.push(th.textContent.replace(/[📊👤📦🔢💰💵🎯📈📅]/g, '').trim());
+                });
+                rows.push(headers);
+
+                // Data rows
+                table.querySelectorAll('tbody tr').forEach(tr => {
+                    const row = [];
+                    tr.querySelectorAll('td').forEach(td => {
+                        row.push(td.textContent);
+                    });
+                    rows.push(row);
+                });
+
+                // Generar tabla en PDF
+                let y = 70;
+                const cellHeight = 8;
+                const cellWidth = 26;
+
+                rows.forEach((row, rowIndex) => {
+                    let x = 15;
+                    row.forEach((cell, cellIndex) => {
+                        if (rowIndex === 0) {
+                            doc.setFillColor(255, 215, 0);
+                            doc.rect(x, y, cellWidth, cellHeight, 'F');
+                            doc.setTextColor(0, 0, 0);
+                            doc.setFontSize(9);
+                        } else {
+                            doc.setTextColor(0, 0, 0);
+                            doc.setFontSize(8);
+                            if (rowIndex % 2 === 0) {
+                                doc.setFillColor(255, 248, 220);
+                                doc.rect(x, y, cellWidth, cellHeight, 'F');
+                            }
+                        }
+
+                        doc.text(cell.toString().substring(0, 14), x + 2, y + 5);
+                        x += cellWidth;
+                    });
+                    y += cellHeight;
+                });
+
+                // Totales con estilo corporativo
+                const totales = document.querySelectorAll('.total-card .value');
+                y += 15;
+
+                doc.setFillColor(255, 215, 0);// Dorado
+                doc.rect(15, y, 267, 25, 'F');
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(16);
+                doc.text('RESUMEN EJECUTIVO', 20, y + 10);
+
+                y += 30;
+                doc.setFontSize(14);
+                doc.text(`Total Piezas Vendidas: ${totales[0] ? totales[0].textContent : 'N/A'}`, 20, y);
+                y += 10;
+                doc.text(`Total Ventas: ${totales[1] ? totales[1].textContent : 'N/A'}`, 20, y);
+                y += 10;
+                doc.text(`Stock en Bodega: ${totales[2] ? totales[2].textContent : 'N/A'}`, 20, y);
+                y += 10;
+                doc.text(`Total Master: ${totales[4] ? totales[4].textContent : 'N/A'}`, 20, y);
+
+                // Footer corporativo
+                doc.setTextColor(100, 100, 100);
+                doc.setFontSize(10);
+                doc.text('Lions International - Documento Confidencial', 15, 200);
+                doc.text('www.lionsinternational.com', 200, 200);
+
+                doc.save('lions-international-ventas.pdf');
+                showSuccessMessage('PDF generado correctamente');
+            }
+
+            // Función para exportar a Excel
+            function exportToExcel() {
+                const table = document.getElementById('salesTable');
+                const wb = XLSX.utils.book_new();
+
+                // Datos corporativos
+                const totalData = [];
+                totalData.push(['LIONS INTERNATIONAL - REPORTE DE VENTAS', '', '', '', '', '', '', '', '', '']);
+                totalData.push(['Sistema de Gestión Comercial', '', '', '', '', '', '', '', '', '']);
+                totalData.push(['', '', '', '', '', '', '', '', '', '']);
+                totalData.push(['RESUMEN EJECUTIVO', '', '', '', '', '', '', '', '', '']);
+                totalData.push(['Métrica', 'Valor', '', '', '', '', '', '', '', '']);
+
+                const totales = document.querySelectorAll('.total-card');
+                totales.forEach(card => {
+                    const titulo = card.querySelector('h3').textContent.replace(/[📊💰📦]/g, '').trim();
+                    const valor = card.querySelector('.value').textContent;
+                    totalData.push([titulo, valor, '', '', '', '', '', '', '', '']);
+                });
+
+                totalData.push(['', '', '', '', '', '', '', '', '', '']);
+                totalData.push(['DETALLE DE VENTAS', '', '', '', '', '', '', '', '', '']);
+
+                // Agregar headers de la tabla
+                const headers = [];
+                table.querySelectorAll('thead th').forEach(th => {
+                    headers.push(th.textContent.replace(/[📊👤📦🔢💰💵🎯📈📅]/g, '').trim());
+                });
+                totalData.push(headers);
+
+                // Agregar datos de la tabla
+                table.querySelectorAll('tbody tr').forEach(tr => {
+                    const row = [];
+                    tr.querySelectorAll('td').forEach(td => {
+                        row.push(td.textContent);
+                    });
+                    totalData.push(row);
+                });
+
+                // Crear la hoja con todos los datos
+                const ws_data = XLSX.utils.aoa_to_sheet(totalData);
+
+                // Configurar ancho de columnas
+                const colWidths = [
+                    { wch: 40 }, { wch: 20 }, { wch: 25 }, { wch: 12 },
+                    { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
+                    { wch: 15 }, { wch: 12 }
+                ];
+                ws_data['!cols'] = colWidths;
+
+                // Agregar la hoja al libro
+                XLSX.utils.book_append_sheet(wb, ws_data, 'Reporte de Ventas');
+
+                // Crear hoja adicional con resumen
+                const resumenData = [];
+                resumenData.push(['LIONS INTERNATIONAL', '', '']);
+                resumenData.push(['RESUMEN EJECUTIVO', '', '']);
+                resumenData.push(['', '', '']);
+                resumenData.push(['Fecha de Generación:', new Date().toLocaleDateString(), '']);
+                resumenData.push(['', '', '']);
+
+                const totalesCards = document.querySelectorAll('.total-card');
+                totalesCards.forEach(card => {
+                    const titulo = card.querySelector('h3').textContent.replace(/[📊💰📦]/g, '').trim();
+                    const valor = card.querySelector('.value').textContent;
+                    const descripcion = card.querySelector('.label').textContent;
+                    resumenData.push([titulo, valor, descripcion]);
+                });
+
+                const ws_resumen = XLSX.utils.aoa_to_sheet(resumenData);
+                ws_resumen['!cols'] = [{ wch: 25 }, { wch: 20 }, { wch: 30 }];
+                XLSX.utils.book_append_sheet(wb, ws_resumen, 'Resumen Ejecutivo');
+
+                // Generar y descargar archivo
+                const fecha = new Date().toISOString().split('T')[0];
+                XLSX.writeFile(wb, `Lions-International-Ventas-${fecha}.xlsx`);
+
+                // Mostrar mensaje de éxito
+                showSuccessMessage('Excel generado correctamente');
+            }
+
+            // Función para mostrar mensajes de éxito
+            function showSuccessMessage(message) {
+                // Crear elemento de notificación
+                const notification = document.createElement('div');
+                notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #FFD700, #FFA500);
+                color: #000;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+                z-index: 9999;
+                font-weight: bold;
+                animation: slideIn 0.3s ease-out;
+            ">
+                ✅ ${message}
+            </div>
+        `;
+
+                document.body.appendChild(notification);
+
+                // Remover después de 3 segundos
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+
+            // Agregar animaciones CSS dinámicamente
+            const style = document.createElement('style');
+            style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+            document.head.appendChild(style);
+
+            // Función para validar fechas
+            function validateDateRange() {
+                const fechaInicio = document.querySelector('input[name="fecha_inicio"]');
+                const fechaFin = document.querySelector('input[name="fecha_fin"]');
+
+                if (fechaInicio && fechaFin) {
+                    fechaFin.addEventListener('change', function () {
+                        if (fechaInicio.value && fechaFin.value) {
+                            if (new Date(fechaFin.value) < new Date(fechaInicio.value)) {
+                                alert('⚠️ La fecha de fin no puede ser anterior a la fecha de inicio');
+                                fechaFin.value = fechaInicio.value;
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Función para formatear números en la tabla
+            function formatTableNumbers() {
+                const table = document.getElementById('salesTable');
+                if (table) {
+                    const rows = table.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        // Formatear celdas monetarias (índices 5, 6, 7, 8)
+                        [5, 6, 7, 8].forEach(index => {
+                            if (cells[index]) {
+                                const value = cells[index].textContent.replace('$', '');
+                                if (!isNaN(value)) {
+                                    cells[index].style.fontWeight = 'bold';
+                                    cells[index].style.color = '#ff2600';//
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+
+            // Función para calcular estadísticas adicionales
+            function calculateAdditionalStats() {
+                const table = document.getElementById('salesTable');
+                if (!table) return;
+
+                const rows = table.querySelectorAll('tbody tr');
+                let totalComisiones = 0;
+                let totalGanancias = 0;
+                let ventasPorEmpleado = {};
+
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const empleado = cells[1]?.textContent || 'Desconocido';
+                    const comision = parseFloat(cells[7]?.textContent.replace('$', '') || 0);
+                    const ganancia = parseFloat(cells[8]?.textContent.replace('$', '') || 0);
+                    const totalVenta = parseFloat(cells[6]?.textContent.replace('$', '') || 0);
+
+                    totalComisiones += comision;
+                    totalGanancias += ganancia;
+
+                    if (!ventasPorEmpleado[empleado]) {
+                        ventasPorEmpleado[empleado] = { ventas: 0, comisiones: 0 };
+                    }
+                    ventasPorEmpleado[empleado].ventas += totalVenta;
+                    ventasPorEmpleado[empleado].comisiones += comision;
+                });
+
+                // Agregar estadísticas al final de la página si no existen
+                if (!document.getElementById('estadisticas-adicionales')) {
+                    const estadisticasDiv = document.createElement('div');
+                    estadisticasDiv.id = 'estadisticas-adicionales';
+                    estadisticasDiv.innerHTML = `
+                <div class="totales" style="margin-top: 30px;">
+                    <div class="total-card">
+                        <h3>💼 Total Comisiones</h3>
+                        <div class="value">$${totalComisiones.toFixed(2)}</div>
+                        <div class="label">Comisiones Pagadas</div>
+                    </div>
+                    <div class="total-card">
+                        <h3>📈 Master Total</h3>
+                        <div class="value">$${totalGanancias.toFixed(2)}</div>
+                        <div class="label">Beneficio Neto</div>
+                    </div>
+                    <div class="total-card">
+                        <h3>👥 Vendedores Activos</h3>
+                        <div class="value">${Object.keys(ventasPorEmpleado).length}</div>
+                        <div class="label">Personal de Ventas</div>
+                    </div>
+                </div>
+            `;
+                    document.querySelector('.container').appendChild(estadisticasDiv);
+                }
+            }
+
+            // Función para actualizar fecha actual en footer
+            function updateCurrentDate() {
+                const dateElement = document.getElementById('currentDate');
+                if (dateElement) {
+                    const now = new Date();
+                    const options = {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    };
+                    dateElement.textContent = now.toLocaleDateString('es-ES', options);
+                }
+            }
+
+            // Inicializar funciones cuando el DOM esté listo
+            document.addEventListener('DOMContentLoaded', function () {
+                validateDateRange();
+                formatTableNumbers();
+                calculateAdditionalStats();
+                updateCurrentDate();
+
+                // Agregar efecto hover a las cards de totales
+                const totalCards = document.querySelectorAll('.total-card');
+                totalCards.forEach(card => {
+                    card.addEventListener('mouseenter', function () {
+                        this.style.transform = 'translateY(-5px)';
+                        this.style.transition = 'all 0.3s ease';
+                    });
+
+                    card.addEventListener('mouseleave', function () {
+                        this.style.transform = 'translateY(0)';
+                    });
+                });
+            });
+
+            // Función de ayuda para debugging
+            function debugTable() {
+                const table = document.getElementById('salesTable');
+                if (table) {
+                    console.log('📊 Información de la tabla:');
+                    console.log('- Filas de datos:', table.querySelectorAll('tbody tr').length);
+                    console.log('- Columnas:', table.querySelectorAll('thead th').length);
+
+                    const totales = document.querySelectorAll('.total-card .value');
+                    console.log('📈 Totales calculados:');
+                    totales.forEach((total, index) => {
+                        console.log(`- Total ${index + 1}:`, total.textContent);
+                    });
+                }
+            }
+
+            // Exportar funciones para uso global
+            window.changeLogo = changeLogo;
+            window.exportToPDF = exportToPDF;
+            window.exportToExcel = exportToExcel;
+            window.debugTable = debugTable;
+
+            // Función para limpiar recursos y eventos
+            function cleanup() {
+                // Remover event listeners
+                const fechaFin = document.querySelector('input[name="fecha_fin"]');
+                if (fechaFin) {
+                    fechaFin.removeEventListener('change', validateDateRange);
+                }
+
+                // Limpiar notificaciones pendientes
+                const notifications = document.querySelectorAll('[style*="position: fixed"]');
+                notifications.forEach(notification => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                });
+            }
+
+            // Limpiar al salir de la página
+            window.addEventListener('beforeunload', cleanup);
+
+            // Mensaje de copyright y información del sistema
+            console.log(`
+🦁 LIONS INTERNATIONAL - Sistema de Ventas Corporativo
+📅 Versión: 2.0.1
+👨‍💻 Desarrollado para gestión empresarial
+🔒 Documento confidencial - Uso interno únicamente
+📞 Soporte técnico: sistemas@lionsinternational.com
+    `);
+
+        })(); // Fin del IIFE (Immediately Invoked Function Expression)
+    </script>
+
+</body>
+
+</html>

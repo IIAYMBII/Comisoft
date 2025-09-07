@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Reporte de Ventas - Lions International</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/reporte.css') }}">
-    
+
 </head>
 
 <body>
@@ -15,8 +15,9 @@
             <div class="logo-section">
                 <div class="logo-container" onclick="changeLogo()">
                     <div class="logo" id="logoDisplay">
-    <img src="{{ url_for('static', filename='/image/logo.png') }}" alt="Logo" style="width:60px; height:auto;">
-</div>
+                        <img src="{{ url_for('static', filename='/image/logo.png') }}" alt="Logo"
+                            style="width:60px; height:auto;">
+                    </div>
 
                 </div>
                 <div class="company-info">
@@ -33,54 +34,56 @@
                 <button class="export-btn excel-btn" onclick="exportToExcel()">
                     📊 Exportar Excel
                 </button>
-                   <a href="{{ url_for('dashboard') }}" class="back-link">🔙 Regresar al Dashboard</a>
+                <a href="{{ url_for('dashboard') }}" class="back-link">🔙 Regresar al Dashboard</a>
             </div>
         </div>
 
         <!-- Logo Upload Section -->
 
-<div id="logoDisplay" style="display:none;">
-   <img src="static/images/logo.png" alt="Logo" width="80" height="80">
-</div>
+        <div id="logoDisplay" style="display:none;">
+            <img src="static/images/logo.png" alt="Logo" width="80" height="80">
+        </div>
 
-<table id="salesTable">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>👤 Empleado</th>
-            <th>📦 Producto</th>
-            <th>📊 Paquetes</th>
-            <th>🔢 Piezas</th>
-            <th>💰 Precio Unit.</th>
-            <th>💵 Total Venta</th>
-            <th>🎯 Comisión</th>
-            <th>📈 Master</th>
-            <th>📅 Fecha</th>
-            <th>🗑️ Acción</th> <!-- Nueva columna para botón -->
-        </tr>
-    </thead>
-    <tbody>
-        {% for v in ventas %}
-        <tr>
-            <td>{{ v[0] }}</td>
-            <td>{{ v[1] }}</td>
-            <td>{{ v[2] }}</td>
-            <td>{{ v[3] }}</td>
-            <td>{{ v[4] }}</td>
-            <td>${{ "%.2f"|format(v[5]) }}</td>
-            <td>${{ "%.2f"|format(v[6]) }}</td>
-            <td>${{ "%.2f"|format(v[7]) }}</td>
-            <td>${{ "%.2f"|format(v[8]) }}</td>
-            <td>{{ v[9] }}</td>
-            <td>
-                <form action="{{ url_for('delete_venta', venta_id=v[0]) }}" method="post" style="display:inline;">
-                    <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta venta?')">Borrar</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <table id="salesTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>👤 Empleado</th>
+                    <th>📦 Producto</th>
+                    <th>📊 Paquetes</th>
+                    <th>🔢 Piezas</th>
+                    <th>💰 Precio Unit.</th>
+                    <th>💵 Total Venta</th>
+                    <th>🎯 Comisión</th>
+                    <th>📈 Master</th>
+                    <th>📅 Fecha</th>
+                    <th>🗑️ Acción</th> <!-- Nueva columna para botón -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in ventas %}
+                <tr>
+                    <td>{{ v[0] }}</td>
+                    <td>{{ v[1] }}</td>
+                    <td>{{ v[2] }}</td>
+                    <td>{{ v[3] }}</td>
+                    <td>{{ v[4] }}</td>
+                    <td>${{ "%.2f"|format(v[5]) }}</td>
+                    <td>${{ "%.2f"|format(v[6]) }}</td>
+                    <td>${{ "%.2f"|format(v[7]) }}</td>
+                    <td>${{ "%.2f"|format(v[8]) }}</td>
+                    <td>{{ v[9] }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_venta', venta_id=v[0]) }}" method="post"
+                            style="display:inline;">
+                            <button type="submit"
+                                onclick="return confirm('¿Seguro que deseas eliminar esta venta?')">Borrar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
         <div class="totales">
             <div class="total-card">
@@ -99,7 +102,7 @@
                 <div class="label">Inventario Disponible</div>
             </div>
         </div>
-        
+
 
         <!-- Footer Corporativo -->
         <footer class="corporate-footer">
@@ -163,25 +166,21 @@
 
                 input.click();
             }
-
             // Función para exportar a PDF
             function exportToPDF() {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('l', 'mm', 'a4');
 
-                // Configurar colores corporativos
+                // --- Encabezado ---
                 doc.setFillColor(255, 215, 0); // Dorado
                 doc.rect(0, 0, 297, 30, 'F');
 
-                // Logo y título
                 doc.setTextColor(0, 0, 0);
                 doc.setFontSize(24);
                 doc.text('LIONS INTERNATIONAL', 20, 20);
-                //imagen del logo
+
                 const logoImg = document.getElementById('logoDisplay').querySelector('img');
-doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25); // 297 - margen - ancho
-
-
+                doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25);
 
                 doc.setFontSize(16);
                 doc.text('Reporte Corporativo de Ventas', 20, 40);
@@ -191,7 +190,7 @@ doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25); // 297 - margen - ancho
                 doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 20, 50);
                 doc.text('Sistema de Gestión Comercial', 20, 60);
 
-                // Obtener datos de la tabla
+                // --- Tabla ---
                 const table = document.getElementById('salesTable');
                 const rows = [];
 
@@ -205,13 +204,11 @@ doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25); // 297 - margen - ancho
                 // Data rows
                 table.querySelectorAll('tbody tr').forEach(tr => {
                     const row = [];
-                    tr.querySelectorAll('td').forEach(td => {
-                        row.push(td.textContent);
-                    });
+                    tr.querySelectorAll('td').forEach(td => row.push(td.textContent));
                     rows.push(row);
                 });
 
-                // Generar tabla en PDF
+                // Dibujar tabla
                 let y = 70;
                 const cellHeight = 8;
                 const cellWidth = 26;
@@ -232,20 +229,17 @@ doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25); // 297 - margen - ancho
                                 doc.rect(x, y, cellWidth, cellHeight, 'F');
                             }
                         }
-
                         doc.text(cell.toString().substring(0, 14), x + 2, y + 5);
                         x += cellWidth;
                     });
                     y += cellHeight;
                 });
 
-                // Totales con estilo corporativo
+                // Totales
                 const totales = document.querySelectorAll('.total-card .value');
                 y += 15;
-
-                doc.setFillColor(255, 215, 0);// Dorado
+                doc.setFillColor(255, 215, 0);
                 doc.rect(15, y, 267, 25, 'F');
-
                 doc.setTextColor(0, 0, 0);
                 doc.setFontSize(16);
                 doc.text('RESUMEN EJECUTIVO', 20, y + 10);
@@ -260,17 +254,34 @@ doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25); // 297 - margen - ancho
                 y += 10;
                 doc.text(`Total Master: ${totales[4] ? totales[4].textContent : 'N/A'}`, 20, y);
 
-                // Footer corporativo
+                // Footer
                 doc.setTextColor(100, 100, 100);
                 doc.setFontSize(10);
                 doc.text('Lions International - Documento Confidencial', 15, 200);
                 doc.text('www.lionsinternational.com', 200, 200);
 
-                doc.save('lions-international-ventas.pdf');
-                showSuccessMessage('PDF generado correctamente');
+                // --- Guardar PDF ---
+                const pdfBase64 = doc.output('datauristring').split(',')[1];
+
+                if (window.pywebview) {
+                    // App ejecutable: abrir diálogo de guardado con Python
+                    window.pywebview.api.guardar_pdf(pdfBase64)
+                        .then(msg => {
+                            alert(msg);
+                        });
+                } else {
+                    // Navegador: abrir diálogo de guardado nativo
+                    const blob = doc.output('blob');
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `lions-international-ventas.pdf`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    alert('PDF generado correctamente');
+                }
             }
 
-            // Función para exportar a Excel
+            // Función para exportar a Excel con diálogo de guardado
             function exportToExcel() {
                 const table = document.getElementById('salesTable');
                 const wb = XLSX.utils.book_new();
@@ -293,63 +304,51 @@ doc.addImage(logoImg.src, 'PNG', 270, 3, 25, 25); // 297 - margen - ancho
                 totalData.push(['', '', '', '', '', '', '', '', '', '']);
                 totalData.push(['DETALLE DE VENTAS', '', '', '', '', '', '', '', '', '']);
 
-                // Agregar headers de la tabla
+                // Headers (solo primeras 10 columnas)
                 const headers = [];
-                table.querySelectorAll('thead th').forEach(th => {
-                    headers.push(th.textContent.replace(/[📊👤📦🔢💰💵🎯📈📅]/g, '').trim());
+                table.querySelectorAll('thead th').forEach((th, index) => {
+                    if (index < 10) {
+                        headers.push(th.textContent.replace(/[📊👤📦🔢💰💵🎯📈📅]/g, '').trim());
+                    }
                 });
                 totalData.push(headers);
 
-                // Agregar datos de la tabla
+                // Datos de la tabla (solo primeras 10 columnas)
                 table.querySelectorAll('tbody tr').forEach(tr => {
                     const row = [];
-                    tr.querySelectorAll('td').forEach(td => {
-                        row.push(td.textContent);
+                    tr.querySelectorAll('td').forEach((td, index) => {
+                        if (index < 10) {
+                            row.push(td.textContent);
+                        }
                     });
                     totalData.push(row);
                 });
 
-                // Crear la hoja con todos los datos
+                // Crear hoja
                 const ws_data = XLSX.utils.aoa_to_sheet(totalData);
-
-                // Configurar ancho de columnas
-                const colWidths = [
+                ws_data['!cols'] = [
                     { wch: 40 }, { wch: 20 }, { wch: 25 }, { wch: 12 },
                     { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
                     { wch: 15 }, { wch: 12 }
                 ];
-                ws_data['!cols'] = colWidths;
-
-                // Agregar la hoja al libro
                 XLSX.utils.book_append_sheet(wb, ws_data, 'Reporte de Ventas');
 
-                // Crear hoja adicional con resumen
-                const resumenData = [];
-                resumenData.push(['LIONS INTERNATIONAL', '', '']);
-                resumenData.push(['RESUMEN EJECUTIVO', '', '']);
-                resumenData.push(['', '', '']);
-                resumenData.push(['Fecha de Generación:', new Date().toLocaleDateString(), '']);
-                resumenData.push(['', '', '']);
+                // Convertir libro a Base64
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
 
-                const totalesCards = document.querySelectorAll('.total-card');
-                totalesCards.forEach(card => {
-                    const titulo = card.querySelector('h3').textContent.replace(/[📊💰📦]/g, '').trim();
-                    const valor = card.querySelector('.value').textContent;
-                    const descripcion = card.querySelector('.label').textContent;
-                    resumenData.push([titulo, valor, descripcion]);
-                });
-
-                const ws_resumen = XLSX.utils.aoa_to_sheet(resumenData);
-                ws_resumen['!cols'] = [{ wch: 25 }, { wch: 20 }, { wch: 30 }];
-                XLSX.utils.book_append_sheet(wb, ws_resumen, 'Resumen Ejecutivo');
-
-                // Generar y descargar archivo
-                const fecha = new Date().toISOString().split('T')[0];
-                XLSX.writeFile(wb, `Lions-International-Ventas-${fecha}.xlsx`);
-
-                // Mostrar mensaje de éxito
-                showSuccessMessage('Excel generado correctamente');
+                if (window.pywebview) {
+                    // App ejecutable: abrir diálogo de guardado
+                    window.pywebview.api.guardar_excel(wbout)
+                        .then(msg => {
+                            alert(msg);
+                        });
+                } else {
+                    // Navegador: guardar directamente
+                    XLSX.writeFile(wb, `Lions-International-Ventas-${new Date().toISOString().split('T')[0]}.xlsx`);
+                    alert('Excel generado correctamente');
+                }
             }
+
 
             // Función para mostrar mensajes de éxito
             function showSuccessMessage(message) {

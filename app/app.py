@@ -26,8 +26,13 @@ app = Flask(__name__)
 app.secret_key = 'mi_clave_secreta'  # Necesario para sesiones
 
 
+import os
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "database.db")
+DB_FOLDER = os.path.join(BASE_DIR, "database")  # Carpeta externa
+os.makedirs(DB_FOLDER, exist_ok=True)
+DB_PATH = os.path.join(DB_FOLDER, "database.db")
+
 # Crear base de datos con tablas necesarias
 def init_db():
     conn = sqlite3.connect(DB_PATH)

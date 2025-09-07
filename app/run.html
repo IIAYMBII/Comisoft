@@ -1,0 +1,67 @@
+import os
+import sys
+import threading
+import base64
+import webview
+from tkinter import Tk, filedialog
+from app import app  # importa tu Flask app
+
+# Ajuste de rutas para PyInstaller
+def resource_path(relative_path):
+    """Obtiene la ruta absoluta, funciona con PyInstaller"""
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+# --- API para PyWebView ---
+class Api:
+    def guardar_pdf(self, pdf_base64):
+        # Convierte Base64 a bytes
+        pdf_bytes = base64.b64decode(pdf_base64)
+
+        # Abrir diálogo de guardado
+        filename = webview.windows[0].create_file_dialog(
+            webview.SAVE_DIALOG,
+            save_filename="lions-international-ventas.pdf",
+            file_types=("PDF files (*.pdf)",)
+        )
+        if filename:
+            with open(filename[0], "wb") as f:
+                f.write(pdf_bytes)
+            return f"PDF guardado en: {filename[0]}"
+        return "Operación cancelada"
+
+    def guardar_excel(self, excel_base64):
+        # Convierte Base64 a bytes
+        excel_bytes = base64.b64decode(excel_base64)
+
+        # Abrir diálogo de guardado
+        filename = webview.windows[0].create_file_dialog(
+            webview.SAVE_DIALOG,
+            save_filename="lions-international-ventas.xlsx",
+            file_types=("Excel files (*.xlsx)",)
+        )
+        if filename:
+            with open(filename[0], "wb") as f:
+                f.write(excel_bytes)
+            return f"Excel guardado en: {filename[0]}"
+        return "Operación cancelada"
+
+# Función para iniciar Flask
+def start_flask():
+    app.run(debug=False, port=5000)
+
+if __name__ == "__main__":
+    # Inicia Flask en un hilo
+    t = threading.Thread(target=start_flask)
+    t.daemon = True
+    t.start()
+
+    # Instancia la API
+    api = Api()
+
+    # Crea la ventana PyWebView con API
+    webview.create_window("Inventarios", "http://127.0.0.1:5000", js_api=api)
+    webview.start()
